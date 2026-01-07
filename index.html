@@ -198,15 +198,15 @@ fetch("pokemon.json").then(r=>r.json()).then(data=>{
 function updateBest(){
   const {allChecked} = getSelectedNumbers();
 
-// エンドレスは「全て」以外非表示
-if (ruleSelect.value === "endless" && !allChecked) {
-  bestContainer.style.display = "none";
-  return;
-}
+  // ===== エンドレスのみ全選択必須 =====
+  if (ruleSelect.value === "endless" && !allChecked) {
+    bestContainer.style.display = "none";
+    return;
+  }
 
-// タイムアタックは常に表示
-bestContainer.style.display = "block";
-
+  // タイムアタック or 全選択エンドレス
+  bestContainer.style.display = "block";
+  
   // ===== エンドレス =====
   if (ruleSelect.value === "endless") {
     document.getElementById("bestTitle").textContent =
@@ -406,4 +406,5 @@ function gameOver(reason){
 </script>
 </body>
 </html>
+
 
