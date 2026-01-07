@@ -126,21 +126,6 @@ ruleSelect.addEventListener("change", () => {
   updateBest();
 });
 
-// 時間表記
-  function formatTime(sec){
-  const h = Math.floor(sec / 3600);
-  const m = Math.floor((sec % 3600) / 60);
-  const s = sec % 60;
-  return `${h}時間${m}分${s}秒`;
-}
-
-function formatTimeHMS(sec){
-  const h = Math.floor(sec / 3600);
-  const m = Math.floor((sec % 3600) / 60);
-  const s = sec % 60;
-  return `${h}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
-}
-
 // 日本語正規化
 function normalizeJP(str){
   return str.normalize("NFKC").replace(/[\u3041-\u3096]/g, ch=>String.fromCharCode(ch.charCodeAt(0)+0x60));
@@ -234,30 +219,21 @@ bestContainer.style.display = "block";
   }
 
   // ===== タイムアタック =====
-const info = getSelectedGenInfo();
-const key = attackKey();
-const data = JSON.parse(
-  localStorage.getItem(key) ||
-  '{"score":0,"time":0,"clears":0}'
-);
+  const info = getSelectedGenInfo();
 
-// 👑表示条件：1回以上クリアしている
-const crown = data.clears > 0 ? " 👑" : "";
+  document.getElementById("bestTitle").textContent =
+    `${info.name}の最高記録`;
 
-document.getElementById("bestTitle").textContent =
-  `${info.name}の最高記録${crown}`;
+  // タイムアタックのリザルト表示
+  const key = attackKey();
+const data = JSON.parse(localStorage.getItem(key) ||
+  '{"score":0,"time":0,"clears":0}');
 
-// 表示本文を組み立て
-let body = `スコア：${data.score}/${info.max}`;
-
-// 1回以上クリアしている場合のみ表示
-if (data.clears > 0) {
-  body += `
-タイム：${formatTime(data.time)}
+document.getElementById("bestBody").innerText =
+`スコア：${data.score}/${info.max}
+タイム：${data.time}
 クリア回数：${data.clears}`;
 }
-
-document.getElementById("bestBody").innerText = body;
 
 // 世代チェックトグル
 genCheckboxes.forEach(cb => cb.addEventListener("change", () => {
@@ -312,10 +288,10 @@ function startGame(){
 
   if (ruleSelect.value === "timeattack") {
     // タイムアタック：1秒から計測
-    document.getElementById("timer").textContent = "0:00:00";
+    document.getElementById("timer").textContent = "0";
     attackTimer = setInterval(() => {
       elapsed++;
-      document.getElementById("timer").textContent = formatTimeHMS(elapsed);
+      document.getElementById("timer").textContent = elapsed;
     }, 1000);
   } else {
     // エンドレス
@@ -378,7 +354,7 @@ function gameOver(reason){
 
   const {allChecked} = getSelectedNumbers();
 
-  /* ===== エンドレス最高記録 ===== */
+/* ===== エンドレス最高記録（既存） ===== */
   let bests=[0,0,0];
   if(allChecked){
     bests = JSON.parse(localStorage.getItem(bestKey())||"[0,0,0]");
@@ -388,7 +364,7 @@ function gameOver(reason){
     localStorage.setItem(bestKey(), JSON.stringify(bests));
   }
 
-  /* ===== タイムアタック記録 ===== */
+  /* ===== ② タイムアタック記録（追加） ===== */
   if (ruleSelect.value === "timeattack") {
     const key = attackKey();
     const prev = JSON.parse(
@@ -410,7 +386,7 @@ function gameOver(reason){
     }));
   }
 
-  /* ===== 表示処理 ===== */
+  /* ===== 表示処理（既存） ===== */
   const correctAnswer = modeSelect.value==="num2poke"
     ? pokemon[currentNumber]
     : currentNumber;
@@ -418,7 +394,7 @@ function gameOver(reason){
   let msg = reason + "\nスコア：" + score +
             "\n答えは「" + correctAnswer + "」";
 
-  if (ruleSelect.value === "endless" && allChecked) {
+  if(allChecked){
     msg += "\n最高記録：" + bests.join(" / ");
   }
 
@@ -426,6 +402,7 @@ function gameOver(reason){
   updateBest();
   document.getElementById("game").classList.add("hidden");
 }
+
 </script>
 </body>
 </html>
