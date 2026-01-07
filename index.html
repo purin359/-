@@ -197,12 +197,15 @@ fetch("pokemon.json").then(r=>r.json()).then(data=>{
 
 function updateBest(){
   const {allChecked} = getSelectedNumbers();
-  if(!allChecked){
-    bestContainer.style.display="none";
-    return;
-  }
 
-  bestContainer.style.display="block";
+// エンドレスは「全て」以外非表示
+if (ruleSelect.value === "endless" && !allChecked) {
+  bestContainer.style.display = "none";
+  return;
+}
+
+// タイムアタックは常に表示
+bestContainer.style.display = "block";
 
   // ===== エンドレス =====
   if (ruleSelect.value === "endless") {
@@ -403,3 +406,4 @@ function gameOver(reason){
 </script>
 </body>
 </html>
+
