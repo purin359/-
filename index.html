@@ -114,6 +114,8 @@ ruleSelect.addEventListener("change", () => {
     document.getElementById("timeWrapper").classList.remove("hidden");
     limit = Number(timeSelect.value);
   }
+  // ルール切替時は世代を必ず全選択に戻す
+  genCheckboxes.forEach(c => c.checked = true);
   updateBest();
 });
 
@@ -130,28 +132,21 @@ const genRanges = {
 
 // 選択世代番号取得
 function getSelectedNumbers(){
-  const allCb = Array.from(genCheckboxes).find(c => c.value === "all");
   let selected = [];
+  let allChecked = true;
 
-  // 「全て」がONなら全世代
-  if (allCb.checked) {
-    Object.values(genRanges).forEach(([s, e]) => {
-      for (let i = s; i <= e; i++) selected.push(i);
-    });
-    return { nums: selected, allChecked: true };
-  }
-
-  // 個別世代
-  let anyChecked = false;
   genCheckboxes.forEach(cb => {
-    if (cb.value !== "all" && cb.checked) {
-      anyChecked = true;
-      const [s, e] = genRanges[cb.value];
-      for (let i = s; i <= e; i++) selected.push(i);
+    if (cb.value !== "all") {
+      if (cb.checked) {
+        const [s, e] = genRanges[cb.value];
+        for (let i = s; i <= e; i++) selected.push(i);
+      } else {
+        allChecked = false;
+      }
     }
   });
 
-  return { nums: selected, allChecked: false && anyChecked };
+  return { nums: selected, allChecked };
 }
 
 function bestKey(){ return `pokemon_best_${modeSelect.value}_${limit}`; }
@@ -173,40 +168,37 @@ function updateBest(){
 
 // 世代チェックトグル
 genCheckboxes.forEach(cb => cb.addEventListener("change", () => {
-  const allCb = Array.from(genCheckboxes).find(c => c.value === "all");
+  const allCb = [...genCheckboxes].find(c => c.value === "all");
 
-  // ===== タイムアタック =====
-  if (ruleSelect.value === "timeattack") {
+  // エンドレス
+  if (ruleSelect.value === "endless") {
 
     if (cb.value === "all") {
-      // 全て → 全部ON
+      const anyChecked = [...genCheckboxes]
+        .some(c => c.value !== "all" && c.checked);
+
+      // 何か選ばれている → 全解除
+      if (anyChecked) {
+        genCheckboxes.forEach(c => c.checked = false);
+      }
+      // 何も選ばれていない → 全選択
+      else {
+        genCheckboxes.forEach(c => c.checked = true);
+      }
+    } else {
+      // 個別変更時は「全て」を解除
+      allCb.checked = false;
+    }
+  }
+
+  // タイムアタック
+  else {
+    if (cb.value === "all") {
       genCheckboxes.forEach(c => c.checked = true);
     } else {
-      // 個別 → その1つだけ
       genCheckboxes.forEach(c => {
         c.checked = (c === cb);
       });
-    }
-
-  // ===== エンドレス =====
-  } else {
-
-    if (cb.value === "all") {
-      const anyChecked = genCheckboxes.some(
-        c => c.value !== "all" && c.checked
-      );
-
-      if (anyChecked) {
-        // どこか選ばれている → 全解除
-        genCheckboxes.forEach(c => c.checked = false);
-      } else {
-        // 何も選ばれていない → 全選択
-        genCheckboxes.forEach(c => c.checked = true);
-      }
-
-    } else {
-      // 個別操作時：all は外す
-      allCb.checked = false;
     }
   }
 
@@ -311,4 +303,5 @@ function gameOver(reason){
 </script>
 </body>
 </html>
+
 
