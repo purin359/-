@@ -218,22 +218,31 @@ function updateBest(){
     return;
   }
 
-  // ===== タイムアタック =====
-  const info = getSelectedGenInfo();
+ // ===== タイムアタック =====
+const info = getSelectedGenInfo();
+const key = attackKey();
+const data = JSON.parse(
+  localStorage.getItem(key) ||
+  '{"score":0,"time":0,"clears":0}'
+);
 
-  document.getElementById("bestTitle").textContent =
-    `${info.name}の最高記録`;
+// 👑：1回以上クリアしている場合のみ
+const crown = data.clears > 0 ? " 👑" : "";
 
-  // タイムアタックのリザルト表示
-  const key = attackKey();
-const data = JSON.parse(localStorage.getItem(key) ||
-  '{"score":0,"time":0,"clears":0}');
+document.getElementById("bestTitle").textContent =
+  `${info.name}の最高記録${crown}`;
 
-document.getElementById("bestBody").innerText =
-`スコア：${data.score}/${info.max}
+// 表示本文を組み立てる
+let body = `スコア：${data.score}/${info.max}`;
+
+// 1回以上クリアしている場合のみ追加表示
+if (data.clears > 0) {
+  body += `
 タイム：${data.time}
 クリア回数：${data.clears}`;
 }
+
+document.getElementById("bestBody").innerText = body;
 
 // 世代チェックトグル
 genCheckboxes.forEach(cb => cb.addEventListener("change", () => {
@@ -364,7 +373,7 @@ function gameOver(reason){
     localStorage.setItem(bestKey(), JSON.stringify(bests));
   }
 
-  /* ===== ② タイムアタック記録 ===== */
+  /* ===== タイムアタック記録 ===== */
   if (ruleSelect.value === "timeattack") {
     const key = attackKey();
     const prev = JSON.parse(
@@ -406,6 +415,3 @@ function gameOver(reason){
 </script>
 </body>
 </html>
-
-
-
