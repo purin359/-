@@ -304,14 +304,15 @@ bestContainer.style.display = "block";
   // ===== タイムアタック =====
   const info = getSelectedGenInfo();
 
+  // タイムアタックのリザルト表示
+  const key = attackKey();
+  // 読み込み（回復）
+  const data = loadAttackData(key);
+
+  
   const crown = data.clears > 0 ? " 👑" :"";
   document.getElementById("bestTitle").textContent =
     `${info.name}の最高記録${crown}`;
-
-  // タイムアタックのリザルト表示
-  const key = attackKey();
-// 読み込み（回復）
-const data = loadAttackData(key);
 
 document.getElementById("bestBody").innerText =
 `スコア：${data.score}/${info.max}
@@ -548,3 +549,4 @@ else {
 </script>
 </body>
 </html>
+
