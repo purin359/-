@@ -304,8 +304,9 @@ bestContainer.style.display = "block";
   // ===== タイムアタック =====
   const info = getSelectedGenInfo();
 
+  const crown = data.clears > 0 ? " 👑" :"";
   document.getElementById("bestTitle").textContent =
-    `${info.name}の最高記録`;
+    `${info.name}の最高記録${crown}`;
 
   // タイムアタックのリザルト表示
   const key = attackKey();
@@ -498,17 +499,29 @@ function gameOver(reason){
   }
 
   /* ===== 表示処理 ===== */
-  const correctAnswer = modeSelect.value==="num2poke"
-    ? pokemon[currentNumber]
-    : currentNumber;
+const correctAnswer = modeSelect.value==="num2poke"
+  ? pokemon[currentNumber]
+  : currentNumber;
 
-  let msg = reason + "\nスコア：" + score +
-            "\n答えは「" + correctAnswer + "」";
+let msg = "";
+
+if (reason === "🎉 全問クリア！") {
+  const info = getSelectedGenInfo();
+  const masterName = info.name === "全て" ? "図鑑番号" : info.name;
+
+  msg =
+`クリア！おめでとう！
+あなたは${masterName}マスター！
+クリアタイム：${formatHMS_Result(elapsed)}`;
+}
+else {
+  msg = reason + "\nスコア：" + score +
+        "\n答えは「" + correctAnswer + "」";
 
   if (ruleSelect.value === "timeattack") {
-    msg += "\nタイム：" +
-  formatHMS_Result(elapsed);
+    msg += "\nタイム：" + formatHMS_Result(elapsed);
   }
+}
 
   if(allChecked){
     msg += "\n最高記録：" + bests.join(" / ");
@@ -535,4 +548,3 @@ function gameOver(reason){
 </script>
 </body>
 </html>
-
