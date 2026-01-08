@@ -112,6 +112,7 @@ let limit = 30;
 let score = 0;
 let elapsed = 0;
 let attackTimer = null;
+let attackPool = []; // タイムアタック用・残り出題リスト
 
 function saveAttackData(key, data){
   const safe = {
@@ -314,7 +315,9 @@ function startGame(){
   clearInterval(attackTimer);
 
   if (ruleSelect.value === "timeattack") {
-    // タイムアタック：1秒から計測
+    // タイムアタック用プール作成（重複防止）
+    attackPool = getSelectedNumbers().nums.slice();
+
     document.getElementById("timer").textContent = "0";
     attackTimer = setInterval(() => {
       elapsed++;
@@ -327,29 +330,50 @@ function startGame(){
 
   nextQuestion();
 }
-
+  
 // 次の問題
 function nextQuestion(){
   clearInterval(timer);
-  const {nums} = getSelectedNumbers();
-  if(nums.length===0){ alert("世代を選択してください"); return; }
 
-  if (ruleSelect.value === "endless") {
-  if(limit===0){
-    document.getElementById("timer").textContent="∞";
-  } else{
-    timeLeft = limit;
-    document.getElementById("timer").textContent = timeLeft;
-    timer = setInterval(()=>{
-      timeLeft--;
-      document.getElementById("timer").textContent = timeLeft;
-      if(timeLeft<=0) gameOver("時間切れ！");
-    },1000);
+  // ===== タイムアタック =====
+  if (ruleSelect.value === "timeattack") {
+
+    // 全問正解 → クリア
+    if (attackPool.length === 0) {
+      gameOver("🎉 全問クリア！");
+      return;
+    }
+
+    // 残りからランダムで1体取り出す
+    const idx = Math.floor(Math.random() * attackPool.length);
+    currentNumber = attackPool.splice(idx, 1)[0];
   }
-}
 
-  currentNumber=nums[Math.floor(Math.random()*nums.length)];
-  document.getElementById("number").textContent = modeSelect.value==="num2poke"?currentNumber:pokemon[currentNumber];
+  // ===== エンドレス =====
+  else {
+    const {nums} = getSelectedNumbers();
+    if(nums.length===0){ alert("世代を選択してください"); return; }
+
+    if(limit===0){
+      document.getElementById("timer").textContent="∞";
+    } else{
+      timeLeft = limit;
+      document.getElementById("timer").textContent = timeLeft;
+      timer = setInterval(()=>{
+        timeLeft--;
+        document.getElementById("timer").textContent = timeLeft;
+        if(timeLeft<=0) gameOver("時間切れ！");
+      },1000);
+    }
+
+    currentNumber = nums[Math.floor(Math.random()*nums.length)];
+  }
+
+  document.getElementById("number").textContent =
+    modeSelect.value==="num2poke"
+      ? currentNumber
+      : pokemon[currentNumber];
+
   answer.value="";
   answer.focus();
 }
@@ -431,4 +455,3 @@ function gameOver(reason){
 </script>
 </body>
 </html>
-
