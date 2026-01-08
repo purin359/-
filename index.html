@@ -248,13 +248,7 @@ function getSelectedNumbers(){
   let selected = [];
   let allChecked = true;
 
-  genCheckboxes.forEach(cb => cd.addEventListener("change", () => {
-
-    if (isPlaying) {
-      forceEndGame();
-      return;
-    }
-    
+  genCheckboxes.forEach(cb => {
     if (cb.value !== "all") {
       if (cb.checked) {
         const [s, e] = genRanges[cb.value];
@@ -268,7 +262,10 @@ function getSelectedNumbers(){
   return { nums: selected, allChecked };
 }
 
-function bestKey(){ return `pokemon_best_${modeSelect.value}_${limit}`; }
+function bestKey(){ 
+  const info = getSelectedGenInfo();
+  return `pokemon_best_${modeSelect.value}_${limit}_${info.name}`;
+}
 function attackKey(){
   const info = getSelectedGenInfo();
   return `pokemon_attack_${modeSelect.value}_${info.name}`;
@@ -323,6 +320,12 @@ document.getElementById("bestBody").innerText =
 
 // 世代チェックトグル
 genCheckboxes.forEach(cb => cb.addEventListener("change", () => {
+
+  if (isPlaying) {
+    forceEndGame();
+    return;
+  }
+  
   const allCb = [...genCheckboxes].find(c => c.value === "all");
 
   // エンドレス
@@ -532,3 +535,4 @@ function gameOver(reason){
 </script>
 </body>
 </html>
+
