@@ -86,6 +86,36 @@ select, input, button { width:100%; font-size:1.1em; padding:10px; margin:8px 0;
 </div>
 
 <script>
+// ゲーム中表示用 0:00:00
+  function formatHMS_Game(sec){
+  const h = Math.floor(sec / 3600);
+  const m = Math.floor((sec % 3600) / 60);
+  const s = sec % 60;
+
+  // 1時間未満
+  if (h === 0) {
+    return `${m}:${String(s).padStart(2,"0")}`;
+}
+
+  // 1時間以上
+  return `${h}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+  }
+
+// リザルト・最高記録用 0時間00分00秒
+  function formatHMS_Result(sec){
+  const h = Math.floor(sec / 3600);
+  const m = Math.floor((sec % 3600) / 60);
+  const s = sec % 60;
+
+  // 1時間未満
+  if (h === 0) {
+    return `${m}分${String(s).padStart(2,"0")}秒`;
+}
+
+  // 1時間以上
+  return `${h}時間${String(m).padStart(2,"0")}分${String(s).padStart(2,"0")}秒`;
+  }
+
 function loadAttackData(key){
   try {
     const raw = localStorage.getItem(key);
@@ -154,36 +184,7 @@ ruleSelect.addEventListener("change", () => {
   updateBest();
 });
 
-  // ゲーム中表示用 0:00:00
-  function formatHMS_Game(sec){
-  const h = Math.floor(sec / 3600);
-  const m = Math.floor((sec % 3600) / 60);
-  const s = sec % 60;
-
-  // 1時間未満
-  if (h === 0) {
-    return `${m}:${String(s).padStart(2,"0")}`;
-}
-
-  // 1時間以上
-  return `${h}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
-  }
-
-// リザルト・最高記録用 0時間00分00秒
-  function formatHMS_Result(sec){
-  const h = Math.floor(sec / 3600);
-  const m = Math.floor((sec % 3600) / 60);
-  const s = sec % 60;
-
-  // 1時間未満
-  if (h === 0) {
-    return `${m}分${String(s).padStart(2,"0")}秒`;
-}
-
-  // 1時間以上
-  return `${h}時間${String(m).padStart(2,"0")}分${String(s).padStart(2,"0")}秒`;
-  }
-
+  
 // 日本語正規化
 function normalizeJP(str){
   return str.normalize("NFKC").replace(/[\u3041-\u3096]/g, ch=>String.fromCharCode(ch.charCodeAt(0)+0x60));
@@ -490,6 +491,7 @@ function gameOver(reason){
 </script>
 </body>
 </html>
+
 
 
 
