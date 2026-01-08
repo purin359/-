@@ -144,6 +144,7 @@ let elapsed = 0;
 let attackTimer = null;
 let attackPool = []; // タイムアタック用・残り出題リスト
 let isPlaying = false;
+let isNewRecord = false; // NEW RECORD判定用
 
 function saveAttackData(key, data){
   const safe = {
@@ -505,13 +506,20 @@ if (ruleSelect.value === "timeattack") {
   // スコアは常に最大値
   const newScore = Math.max(prev.score, score);
 
-  // ★ クリアしたときだけタイム更新 ★
-  let newTime = prev.time;
-  if (cleared) {
-    newTime =
-      prev.time === 0 ? elapsed : Math.min(prev.time, elapsed);
-  }
+  // ★ NEW RECORD 判定をリセット
+isNewRecord = false;
 
+// ★ クリアしたときだけタイム更新 ★
+let newTime = prev.time;
+
+if (cleared) {
+  // 初クリア または 自己ベスト更新
+  if (prev.time === 0 || elapsed < prev.time) {
+    newTime = elapsed;
+    isNewRecord = true; // ★ NEW RECORD！
+  }
+}
+  
   // クリア回数もクリア時のみ増やす
   const newClears = prev.clears + (cleared ? 1 : 0);
 
@@ -536,6 +544,11 @@ if (reason === "🎉 全問クリア！") {
 `クリア！おめでとう！
 あなたは${masterName}マスター！
 クリアタイム：${formatHMS_Result(elapsed)}`;
+
+  // NEW RECORD 表示
+  if (isNewRecord) {
+    msg += "/n🎉 NEW RECORD！";
+  }
 }
 else {
   msg = reason + "\nスコア：" + score +
