@@ -369,6 +369,17 @@ genCheckboxes.forEach(cb => cb.addEventListener("change", () => {
     }
   }
 
+// ★ 個別世代がすべてONなら「全て」もONにする
+if (ruleSelect.value === "endless") {
+  const allCb = [...genCheckboxes].find(c => c.value === "all");
+  const others = [...genCheckboxes].filter(c => c.value !== "all");
+
+  const allCheckedNow = others.every(c => c.checked);
+  if (allCheckedNow) {
+    allCb.checked = true;
+  }
+}
+
   // タイムアタック
   else {
     if (cb.value === "all") {
@@ -588,3 +599,4 @@ if (
 </script>
 </body>
 </html>
+
