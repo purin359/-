@@ -148,6 +148,7 @@ let isNewRecord = false; // NEW RECORD判定用
 
 function saveAttackData(key, data){
   const safe = {
+    version: DATA_VERSION,
     score: Math.max(0, Number(data.score) || 0),
     time: Math.max(0, Number(data.time) || 0),
     clears: Math.max(0, Number(data.clears) || 0)
@@ -156,6 +157,27 @@ function saveAttackData(key, data){
   localStorage.setItem(key, JSON.stringify(safe));
 }
 
+  function loadAttackData(key){
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return { score: 0, time: 0, clears: 0 };
+
+    const d = JSON.parse(raw);
+
+    return {
+      score: Number(d.score) || 0,
+      time: Number(d.time) || 0,
+      clears: Number(d.clears) || 0
+    };
+  } catch {
+    return { score: 0, time: 0, clears: 0 };
+  }
+}
+
+// ====== 定数 ======
+const DATA_VERSION = 1;
+
+// ====== DOM参照 ======
 const answer = document.getElementById("answer");
 const timeSelect = document.getElementById("timeSelect");
 const bestContainer = document.getElementById("bestContainer");
@@ -648,5 +670,6 @@ if (
 </script>
 </body>
 </html>
+
 
 
