@@ -559,9 +559,13 @@ else {
   }
 }
 
-  if(allChecked){
-    msg += "\n最高記録：" + bests.join(" / ");
-  }
+  // ★ エンドレス ＆ 全て選択 ＆ ゲームオーバー時のみ表示
+if (
+  ruleSelect.value === "endless" &&
+  allChecked
+) {
+  msg += "\n最高記録：" + bests.join(" / ");
+}
 
   messageDiv.textContent = msg;
   updateBest();
